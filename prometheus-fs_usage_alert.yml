@@ -1,0 +1,20 @@
+---
+- name: Automatic Remediation of a server
+  hosts: rhel7
+  sources:
+    - name: listen for alerts
+      ansible.eda.alertmanager:
+        host: 0.0.0.0
+        port: 5000
+  
+  rules:
+    - name: Disk Utilization Warning and Take Action
+      condition: event.alert.labels.job == "filesystem_used_alert" or event.alert.status == "firing"
+      action:
+        run_workflow_template:
+          name: 100_EDA_02-disk_usage_exceed_limit_warning
+          organization: Venetian
+            #  job_args:
+            #limit: "{{ event.meta.hosts }}"
+        # run_playbook:
+        #  name: cpu-playbook.yml
